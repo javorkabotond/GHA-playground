@@ -16,21 +16,17 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+        echo "${{ secrets.SSH_DOMAIN }}" > domain.txt
+        ssh-keyscan -H $(cat domain.txt) >> ~/.ssh/known_hosts
+      env:
+        SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
 
     - name: Add SSH Key with Passphrase
       run: |
-        # Start the SSH agent
         eval $(ssh-agent -s)
-
-        # Save private key to a file
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-
-        # Add the private key to the SSH agent
         echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add private_key.pem
-
-        # Clean up private key file
         rm private_key.pem
 
     - name: Deploy files to server
