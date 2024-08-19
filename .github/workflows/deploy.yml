@@ -13,14 +13,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up SSH
+   - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+        ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
       env:
         SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
 
-    - name: Add SSH Key with Passphrase
+    - name: Add SSH Key
       run: |
         eval $(ssh-agent -s)
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
@@ -35,3 +36,4 @@ jobs:
     - name: Clean up SSH
       run: |
         ssh-add -D
+
