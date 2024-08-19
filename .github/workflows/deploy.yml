@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # vagy a fő branch neved
+      - main  # vagy a fő branch neve, amelyről deploy-olsz
 
 jobs:
   deploy:
@@ -20,10 +20,11 @@ jobs:
 
     - name: Deploy files to server
       run: |
-        scp -r ./${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}.com:/home/username/public_html/
+        scp -r ./ public_html/ ${{ secrets.USER }}@${{ secrets.SSH_DOMAIN }}:/home/username/public_html/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clean up SSH
       run: |
         ssh-add -D
+
