@@ -1,9 +1,11 @@
 name: SSH Deploy
 
+name: Deploy to Server
+
 on:
   push:
     branches:
-      - main
+      - main  # vagy a fő branch neved
 
 jobs:
   deploy:
@@ -13,12 +15,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Add SSH key
+    - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy via SSH
+    - name: Deploy files to server
       run: |
-        ssh -o StrictHostKeyChecking=no bototjkv@162.0.232.68 "
-          git pull origin main "
+        scp -r ./${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}.com:/home/username/public_html/
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Clean up SSH
+      run: |
+        ssh-add -D
