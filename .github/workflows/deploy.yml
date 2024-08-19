@@ -14,29 +14,28 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        ssh-auth-sock: ${{ runner.temp }}/ssh-agent.sock
-
-    - name: Add remote server to known_hosts
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
 
     - name: Add SSH Key with Passphrase
       run: |
+        # Start the SSH agent
+        eval $(ssh-agent -s)
+
+        # Save private key to a file
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-        eval $(ssh-agent -s)
-        ssh-add private_key.pem <<<"${{ secrets.SSH_PASSPHRASE }}"
+
+        # Add the private key to the SSH agent
+        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add private_key.pem
+
+        # Clean up private key file
         rm private_key.pem
 
     - name: Deploy files to server
       run: |
         scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/${{ secrets.SSH_USER }}/public_html/
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clean up SSH
       run: |
