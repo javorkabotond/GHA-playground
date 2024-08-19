@@ -26,8 +26,11 @@ jobs:
 
     - name: Add SSH Key with Passphrase
       run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
         eval $(ssh-agent -s)
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -k - <<<"${{ secrets.SSH_PASSPHRASE }}"
+        ssh-add private_key.pem <<<"${{ secrets.SSH_PASSPHRASE }}"
+        rm private_key.pem
 
     - name: Deploy files to server
       run: |
