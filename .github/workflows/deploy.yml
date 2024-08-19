@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # A fő branch neve, amelyről deploy-olsz
+      - main
 
 jobs:
   deploy:
@@ -11,13 +11,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_DOMAIN }}" > domain.txt
-        ssh-keyscan -H $(cat domain.txt) >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
       env:
         SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
 
