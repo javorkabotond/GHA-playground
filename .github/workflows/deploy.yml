@@ -20,7 +20,7 @@ jobs:
 
     - name: Deploy files to server
       run: |
-        scp -r ./ public_html/ ${{ secrets.USER }}@${{ secrets.SSH_DOMAIN }}:/home/username/public_html/
+        scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/username/public_html/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
