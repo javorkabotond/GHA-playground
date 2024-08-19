@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # vagy a fő branch neve, amelyről deploy-olsz
+      - main  # A fő branch neve, amelyről deploy-olsz
 
 jobs:
   deploy:
@@ -17,21 +17,24 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-auth-sock: ${{ runner.temp }}/ssh-agent.sock
 
     - name: Add remote server to known_hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+
+    - name: Add SSH Key with Passphrase
+      run: |
+        eval $(ssh-agent -s)
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -k - <<<"${{ secrets.SSH_PASSPHRASE }}"
 
     - name: Deploy files to server
       run: |
-        scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/bototjkv/public_html/
+        scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/${{ secrets.SSH_USER }}/public_html/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clean up SSH
       run: |
         ssh-add -D
-
-
-
