@@ -18,14 +18,20 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    - name: Add remote server to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+
     - name: Deploy files to server
       run: |
-        scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/username/public_html/
+        scp -P ${{ secrets.SSH_PORT }} -r ./ public_html/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }}:/home/bototjkv/public_html/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clean up SSH
       run: |
         ssh-add -D
+
 
 
