@@ -19,28 +19,15 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
 
-    - name: Start SSH Agent
+    - name: Start SSH Agent and Add Key
       run: |
         eval $(ssh-agent -s)
-        echo "SSH_AGENT_PID: $SSH_AGENT_PID"
-        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-
-    - name: Debug SSH Agent
-      run: |
-        echo "SSH_AGENT_PID: $SSH_AGENT_PID"
-        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
-        ps -ef | grep ssh-agent
-        ls -l $SSH_AUTH_SOCK
-
-    - name: Add SSH Key
-      run: |
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private_key.pem
         chmod 600 private_key.pem
         ssh-add private_key.pem
         rm private_key.pem
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SSH_AUTH_SOCK: $SSH_AUTH_SOCK
 
     - name: Deploy files to server
       run: |
@@ -49,4 +36,3 @@ jobs:
     - name: Clean up SSH
       run: |
         ssh-add -D
-
