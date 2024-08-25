@@ -14,7 +14,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up SSH
+    - name: Set up ssh
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
