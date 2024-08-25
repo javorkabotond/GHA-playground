@@ -22,13 +22,17 @@ jobs:
         SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
 
-    - name: Add SSH Key
-      run: |
-        eval $(ssh-agent -s)
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-        chmod 600 private_key.pem
-        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add private_key.pem
-        rm private_key.pem
+      - name: Start SSH Agent
+        run: eval $(ssh-agent -s)
+
+      - name: Add SSH Key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh-add private_key.pem
+          rm private_key.pem
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy files to server
       run: |
