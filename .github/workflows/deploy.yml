@@ -18,12 +18,12 @@ jobs:
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
-      env:
-        SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
-        SSH_PORT: ${{ secrets.SSH_PORT }}
 
     - name: Start SSH Agent
-      run: eval $(ssh-agent -s)
+      run: |
+        eval $(ssh-agent -s)
+        echo "SSH_AGENT_PID: $SSH_AGENT_PID"
+        echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
 
     - name: Add SSH Key
       run: |
