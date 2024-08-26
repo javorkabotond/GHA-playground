@@ -22,15 +22,26 @@ jobs:
         SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
 
-    - name: Start SSH Agent and Add Key
+    - name: Setup SSH agent and add private key
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
       run: |
+        # Indítsd el az ssh-agent-et
         eval $(ssh-agent -s)
+
+        # Privát kulcs fájl létrehozása
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private_key.pem
         chmod 600 private_key.pem
-        ssh-add private_key.pem
+
+        # Kulcs hozzáadása az ssh-agenthez, passphrase használatával
+        echo "$SSH_PASSPHRASE" | ssh-add private_key.pem
+
+        # Privát kulcs fájl törlése
         rm private_key.pem
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
 
     - name: Test SSH Connection and Print Message
       run: |
