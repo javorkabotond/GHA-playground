@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_STEP_DEBUG: true  # Debug engedélyezése az egész jobban
 
     steps:
     - name: Checkout code
@@ -24,17 +26,11 @@ jobs:
 
     - name: Setup SSH agent and add private key
       run: |
-        # Indítsd el az ssh-agent-et
         eval $(ssh-agent -s)
-
-        # Privát kulcs fájl létrehozása
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private_key.pem
         chmod 600 private_key.pem
-
-        # Kulcs hozzáadása az ssh-agenthez, passphrase használatával
-        echo "$SSH_PASSPHRASE" | ssh-add private_key.pem
-
-        # Privát kulcs fájl törlése
+        ssh-add private_key.pem
+        ssh-add -l
         rm private_key.pem
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -47,4 +43,3 @@ jobs:
         SSH_PORT: ${{ secrets.SSH_PORT }}
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
-
