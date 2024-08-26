@@ -1,7 +1,7 @@
 name: Deploy to Server
 
 on:
-  workflow_dispatch: # Manuális indítás
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -24,17 +24,10 @@ jobs:
 
     - name: Setup SSH agent and add private key
       run: |
-        # Indítsd el az ssh-agent-et
         eval $(ssh-agent -s)
-
-        # Privát kulcs fájl létrehozása
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private_key.pem
         chmod 600 private_key.pem
-
-        # Kulcs hozzáadása az ssh-agenthez, passphrase használatával
         echo "$SSH_PASSPHRASE" | ssh-add private_key.pem
-
-        # Privát kulcs fájl törlése
         rm private_key.pem
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -42,7 +35,7 @@ jobs:
 
     - name: Test SSH Connection and Print Message
       run: |
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }} 'echo "Deploy sikeres!"'
+        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }} 'echo "Deploy sikeres!"'
       env:
         SSH_PORT: ${{ secrets.SSH_PORT }}
         SSH_USER: ${{ secrets.SSH_USER }}
