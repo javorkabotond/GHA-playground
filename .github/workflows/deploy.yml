@@ -23,9 +23,6 @@ jobs:
         SSH_PORT: ${{ secrets.SSH_PORT }}
 
     - name: Setup SSH agent and add private key
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
       run: |
         # Indítsd el az ssh-agent-et
         eval $(ssh-agent -s)
@@ -46,4 +43,7 @@ jobs:
     - name: Test SSH Connection and Print Message
       run: |
         ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_DOMAIN }} 'echo "Deploy sikeres!"'
-
+      env:
+        SSH_PORT: ${{ secrets.SSH_PORT }}
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
