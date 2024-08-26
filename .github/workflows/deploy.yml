@@ -17,7 +17,10 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+        ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_DOMAIN }} >> ~/.ssh/known_hosts
+      env:
+        SSH_DOMAIN: ${{ secrets.SSH_DOMAIN }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
 
     - name: Start SSH Agent and Add Key
       run: |
